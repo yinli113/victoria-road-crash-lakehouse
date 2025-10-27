@@ -1,0 +1,5 @@
+{
+  "name": "accident-lakehouse",
+  "description": "Serverless Databricks lakehouse project for Victoria road crash ETL/ELT.",
+  "version": "0.1.0"
+}
