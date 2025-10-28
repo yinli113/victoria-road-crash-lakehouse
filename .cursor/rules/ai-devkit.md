@@ -9,6 +9,7 @@ Provide project-specific guardrails so Cursor agents follow the Databricks accid
 - Register all tables through Unity Catalog under catalog `yinli_catalog`
 - Respect SCD2 requirements for policy-related dimensions
 - Align with business goals and core tables listed in `docs/ai/requirements/README.md`
+- Consult architecture details in `docs/ai/design/README.md` before major changes
 
 ## Data Handling
 - Protect credentials; rely on environment variables or secrets
