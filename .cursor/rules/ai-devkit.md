@@ -21,6 +21,7 @@ Provide project-specific guardrails so Cursor agents follow the Databricks accid
 - Prefer SQL/Delta transformations checked into repo
 - Use Cursor commands for planning, implementation, and review steps
 - Log blockers in `docs/ai/issues/README.md` for handoffs
+- Capture detailed troubleshooting in `docs/ai/lessons/README.md`
 
 ## Future Enhancements
 - Leave hooks for dbt integration but keep initial solution Databricks-native
