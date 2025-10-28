@@ -8,6 +8,7 @@ Provide project-specific guardrails so Cursor agents follow the Databricks accid
 - Store bronze/silver/gold Delta tables in `s3://yinli-databricks-metastore-root/{layer}/`
 - Register all tables through Unity Catalog under catalog `yinli_catalog`
 - Respect SCD2 requirements for policy-related dimensions
+- Align with business goals and core tables listed in `docs/ai/requirements/README.md`
 
 ## Data Handling
 - Protect credentials; rely on environment variables or secrets
