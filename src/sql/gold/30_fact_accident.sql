@@ -5,6 +5,7 @@ SELECT
   s.ACCIDENT_NO,
   s.accident_dt,
   s.accident_ts,
+  CAST(DATE_FORMAT(s.accident_ts, 'yyyyMMddHH') AS BIGINT) AS time_key,
   s.severity,
   s.speed_zone,
   s.road_geometry,
@@ -15,6 +16,8 @@ SELECT
 FROM yinli_catalog.silver.accident s
 LEFT JOIN yinli_catalog.gold.dim_location dim
   ON s.NODE_ID = dim.location_key
-  AND dim.is_current;
+  AND dim.is_current
+LEFT JOIN yinli_catalog.gold.dim_time dtime
+  ON CAST(DATE_FORMAT(s.accident_ts, 'yyyyMMddHH') AS BIGINT) = dtime.time_key;
 
 COMMENT ON TABLE yinli_catalog.gold.fact_accident IS 'Accident fact table with links to location dimension.';
