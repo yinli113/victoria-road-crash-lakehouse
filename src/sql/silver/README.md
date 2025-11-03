@@ -9,3 +9,4 @@
 | 50 | 50_transform_road_surface.sql | Clean road surface condition lookup |
 
 Silver tables dedupe records and standardize columns for downstream facts/dimensions.
+| 60 | 60_transform_node.sql | Clean node lookup with coordinates |

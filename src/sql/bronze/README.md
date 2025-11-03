@@ -9,3 +9,4 @@
 | 05 | 05_create_road_surface_stream.sql | Road surface condition lookup ingest |
 
 Each script creates a streaming table and snapshot table under `yinli_catalog.bronze`.
+| 06 | 06_create_node_stream.sql | Node coordinate ingest |

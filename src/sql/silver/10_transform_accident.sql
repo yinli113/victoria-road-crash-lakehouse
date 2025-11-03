@@ -5,7 +5,23 @@ WITH staged AS (
   SELECT
     ACCIDENT_NO,
     cast(ACCIDENT_DATE as date) AS accident_dt,
-    cast(ACCIDENT_TIME as timestamp) AS accident_ts,
+    CASE
+      WHEN ACCIDENT_DATE IS NOT NULL
+        THEN try_to_timestamp(
+          concat(
+            ACCIDENT_DATE,
+            lpad(
+              CASE WHEN ACCIDENT_TIME IS NULL THEN '0000'
+                   ELSE REGEXP_REPLACE(ACCIDENT_TIME, '\\D', '')
+              END,
+              4,
+              '0'
+            )
+          ),
+          'yyyyMMddHHmm'
+        )
+      ELSE NULL
+    END AS accident_ts,
     cast(SEVERITY as int) AS severity,
     cast(SPEED_ZONE as int) AS speed_zone,
     cast(ROAD_GEOMETRY as int) AS road_geometry,
