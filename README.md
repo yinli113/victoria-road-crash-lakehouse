@@ -1,6 +1,5 @@
 # Victoria Road Crash Lakehouse (2022-2024)
 
-
 A Databricks lakehouse that ingests the Transport Victoria road-crash dataset into Bronze/Silver/Gold Delta tables, layers weather and surface lookups, enriches crashes with node coordinates, and powers Lakeview dashboards for post-lockdown (2022‑2024) insights. All automation was orchestrated inside the Cursor IDE using its AI devkit, Databricks CLI, and AWS S3. The repo bundles repeatable SQL, Python utilities, automated data-quality tests, and a findings report with dashboard screenshots.
 
 ![Overview dashboard](images/overview_post_lockdown_2022_2024.png)
@@ -96,6 +95,46 @@ Key points:
    ```
 4. **Python 3.12+** on the machine running tests/scripts.
 5. **Cursor IDE** (optional but recommended) with the AI devkit activated.
+
+## Local dbt Development
+
+The repo ships a dbt project (`dbt_project.yml`) aligned with Unity Catalog schemas `yinli_catalog.bronze_raw`, `yinli_catalog.silver_refined`, and `yinli_catalog.gold_marts`.
+
+1. **Create a virtual environment & install packages**
+   ```bash
+   chmod +x scripts/setup_local_dbt.sh
+   ./scripts/setup_local_dbt.sh
+   source .venv/bin/activate
+   ```
+2. **Populate Databricks credentials**
+   ```bash
+   python scripts/create_env.py
+   # follow prompts for HOST, HTTP_PATH, TOKEN, (optional) ORG_ID
+   ```
+   The script writes `.env` (git-ignored). Use the same values as your SQL warehouse connection.
+3. **Configure dbt profile**
+   ```bash
+   mkdir -p ~/.dbt
+   cp profiles/profiles.yml.example ~/.dbt/profiles.yml
+   # edit ~/.dbt/profiles.yml if you need additional targets
+   ```
+4. **Run dbt**
+   ```bash
+   dbt debug           # verify connection
+   dbt deps            # pull packages (none yet, but keeps workflow consistent)
+   dbt build --select state:modified+
+   ```
+   Layer-specific schemas are managed automatically by folder (`dbt/models/bronze|silver|gold`).
+
+## GitHub Actions CI Setup
+
+1. Add repository secrets under `Settings → Secrets and variables → Actions`:
+   - `DATABRICKS_HOST`
+   - `DATABRICKS_HTTP_PATH`
+   - `DATABRICKS_TOKEN`
+   - (Optional) `DATABRICKS_ORG_ID`
+2. The workflow at `.github/workflows/dbt-build.yml` runs on every push to `main` and on all pull requests. It installs Python 3.10, installs `requirements.txt`, copies `profiles/profiles.yml.example` to the action’s `DBT_PROFILES_DIR`, and executes `dbt deps` followed by `dbt build`.
+3. No GitHub PAT is required unless additional private dependencies are introduced.
 
 ## Cursor AI / Databricks / AWS Integration
 
