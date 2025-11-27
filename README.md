@@ -1,4 +1,4 @@
-# Victoria Road Crash Lakehouse (2022-2024)
+# Victoria Road Safety Lakehouse & Analytics Platform (2022-2024)
 
 A Databricks lakehouse that ingests the Transport Victoria road-crash dataset into Bronze/Silver/Gold Delta tables, layers weather and surface lookups, enriches crashes with node coordinates, and powers Lakeview dashboards for post-lockdown (2022‑2024) insights. All automation was orchestrated inside the Cursor IDE using its AI devkit, Databricks CLI, and AWS S3. The repo bundles repeatable SQL, Python utilities, automated data-quality tests, and a findings report with dashboard screenshots.
 

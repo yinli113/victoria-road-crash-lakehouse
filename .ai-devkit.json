@@ -1,5 +1,5 @@
 {
-  "name": "accident-lakehouse",
-  "description": "Serverless Databricks lakehouse project for Victoria road crash ETL/ELT.",
+  "name": "victoria-road-safety-platform",
+  "description": "Databricks + dbt lakehouse and analytics platform for Victoria road safety insights (2022-2024).",
   "version": "0.1.0"
 }
