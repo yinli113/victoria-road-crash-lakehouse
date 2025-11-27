@@ -1,0 +1,16 @@
+accident:
+  target: dev
+  outputs:
+    dev:
+      type: databricks
+      catalog: yinli_catalog
+      schema: bronze_raw
+      host: "{{ env_var('DATABRICKS_HOST') }}"
+      http_path: "{{ env_var('DATABRICKS_HTTP_PATH') }}"
+      token: "{{ env_var('DATABRICKS_TOKEN') }}"
+      threads: 8
+      # Uncomment if your workspace enforces org headers
+      # http_headers:
+      #   X-Databricks-Org-Id: "{{ env_var('DATABRICKS_ORG_ID') }}"
+
+

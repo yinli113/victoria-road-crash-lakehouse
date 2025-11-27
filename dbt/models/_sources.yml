@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: bronze
+    catalog: yinli_catalog
+    schema: bronze
+    tables:
+      - name: accident_stream
+      - name: accident_snapshot
+      - name: vehicle_stream
+      - name: vehicle_snapshot
+      - name: person_stream
+      - name: person_snapshot
+      - name: atmospheric_stream
+      - name: road_surface_stream
+      - name: node_raw
+
+

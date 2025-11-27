@@ -1,0 +1,33 @@
+name: "accident_dbt"
+version: "1.0.0"
+config-version: 2
+
+profile: "accident"
+
+model-paths: ["dbt/models"]
+analysis-paths: ["dbt/analyses"]
+macro-paths: ["dbt/macros"]
+seed-paths: ["dbt/seeds"]
+test-paths: ["dbt/tests"]
+snapshot-paths: ["dbt/snapshots"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  accident_dbt:
+    +catalog: yinli_catalog
+    +materialized: view
+    bronze:
+      +schema: bronze_raw
+      +materialized: table
+    silver:
+      +schema: silver_refined
+      +materialized: table
+    gold:
+      +schema: gold_marts
+      +materialized: table
+
+
