@@ -70,6 +70,19 @@ Key points:
 - Gold adds derived time parts, joins speed/conditions, and (optionally) node coordinates.
 - Summary tables pre-aggregate metrics for low-latency dashboards.
 
+## Workflow Overview
+
+```mermaid
+flowchart TD
+  A[Cursor Plan: research & charter] --> B[AWS S3 bronze ingest]
+  B --> C[Databricks serverless SQL warehouse]
+  C --> D[Lakehouse SQL + Genie dashboards]
+  D --> E[dbt scaffolding & tests]
+  E --> F[GitHub Actions CI (manual/PR)]
+  F --> G[Reporting via Mermaid + Gemini export]
+  G --> H[Owner review & production push]
+```
+
 ## Repository Layout
 
 ```
