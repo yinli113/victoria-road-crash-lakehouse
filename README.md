@@ -11,6 +11,9 @@ A Databricks lakehouse that ingests the Transport Victoria road-crash dataset in
 - [Architecture](#architecture)
 - [Repository Layout](#repository-layout)
 - [Prerequisites](#prerequisites)
+- [Local dbt Development](#local-dbt-development)
+- [GitHub Actions CI Setup](#github-actions-ci-setup)
+- [Reporting Workflow & Visualization](#reporting-workflow--visualization)
 - [Cursor AI/Databricks/AWS Integration](#cursor-ai-databricks-aws-integration)
 - [Bronze → Silver → Gold Pipeline](#bronze--silver--gold-pipeline)
 - [Summary Tables & Dashboards](#summary-tables--dashboards)
@@ -133,8 +136,14 @@ The repo ships a dbt project (`dbt_project.yml`) aligned with Unity Catalog sche
    - `DATABRICKS_HTTP_PATH`
    - `DATABRICKS_TOKEN`
    - (Optional) `DATABRICKS_ORG_ID`
-2. The workflow at `.github/workflows/dbt-build.yml` runs on every push to `main` and on all pull requests. It installs Python 3.10, installs `requirements.txt`, copies `profiles/profiles.yml.example` to the action’s `DBT_PROFILES_DIR`, and executes `dbt deps` followed by `dbt build`.
+2. The workflow at `.github/workflows/dbt-build.yml` can be triggered manually (`workflow_dispatch`) or by any pull request. It installs Python 3.10, installs `requirements.txt`, copies `profiles/profiles.yml.example` to the action’s `DBT_PROFILES_DIR`, and executes `dbt deps` followed by `dbt build`.
 3. No GitHub PAT is required unless additional private dependencies are introduced.
+
+## Reporting Workflow & Visualization
+
+1. **Author the flow** – Use Cursor chat or inline completions to draft Mermaid diagrams that document the analytics process (e.g., data ingestion → Databricks SQL → dbt → CI/CD). Store them directly in Markdown so they render in Cursor previews.
+2. **Export to Gemini** – When a polished visual is required, copy the Mermaid code into Google Gemini 3 (Nano “Banana”) to generate a rendered flowchart or stylistic variant for presentations.
+3. **Publish** – Commit the Mermaid block and, if desired, the exported image (PNG/SVG) under `images/`. Reference both in reports so the workflow remains reproducible and version-controlled.
 
 ## Cursor AI / Databricks / AWS Integration
 
