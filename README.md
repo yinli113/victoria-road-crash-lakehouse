@@ -2,7 +2,7 @@
 
 A Databricks lakehouse that ingests the Transport Victoria road-crash dataset into Bronze/Silver/Gold Delta tables, layers weather and surface lookups, enriches crashes with node coordinates, and powers Lakeview dashboards for post-lockdown (2022‑2024) insights. All automation was orchestrated inside the Cursor IDE using its AI devkit, Databricks CLI, and AWS S3. The repo bundles repeatable SQL, Python utilities, automated data-quality tests, and a findings report with dashboard screenshots.
 
-![Overview dashboard](images/overview_post_lockdown_2022_2024.png)
+![End-to-end lakehouse flow](images/workflow_overview.png)
 
 ## Contents
 
@@ -49,26 +49,25 @@ When sharing derivative work (dashboards, analytics, or code that bundles the da
 ## Architecture
 
 ```
-AWS S3 (raw CSVs)
-  ↓ read_files
-Bronze Delta tables           (accident_stream, atmospheric_stream, road_surface_stream, node_raw)
-  ↓ cleansing, dedupe
-Silver Delta tables            (accident, atmospheric_condition, road_surface_condition, node)
-  ↓ enrichment, joins
-Gold Delta tables              (fact_accident, fact_accident_enriched, dim_time, dim_conditions,
-                               dim_location, dim_dca, summary_* tables)
-  ↓ summaries / dashboards
-Lakeview dashboards            (Overview, Time-of-Day, Conditions & Weather, Spatial Hotspots)
-  ↓ reporting
-Markdown insights              (`docs/ai/insights/post_lockdown_dashboard_findings.md`)
+Cursor Plan & research
+  ↓ product goals
+AWS S3 (bronze storage)      ← credentials via secrets
+  ↓ read_files ingestion
+Databricks serverless SQL Warehouse
+  ↓ bronze/silver/gold SQL pipelines
+dbt Core (models/tests/docs)
+  ↓ lakehouse analytics tables
+GitHub Actions (manual/PR dbt build)
+  ↓ production validation
+Databricks Genie & AI/BI dashboards
+  ↓ reporting & Mermaid/Gemini exports
 ```
 
 Key points:
-- Every table lives in Unity Catalog catalog `yinli_catalog`.
-- Bronze uses Delta tables created via Databricks SQL `read_files` (no Auto Loader cluster needed).
-- Silver applies dedupe windows, schema typing, and merges lookups by `ACCIDENT_NO`.
-- Gold adds derived time parts, joins speed/conditions, and (optionally) node coordinates.
-- Summary tables pre-aggregate metrics for low-latency dashboards.
+- Unity Catalog catalog `yinli_catalog` holds bronze, silver, and gold schemas managed by dbt.
+- Databricks Serverless SQL Warehouse executes both native SQL and dbt-generated code; secrets are injected at runtime.
+- GitHub Actions mirrors local dbt runs but is gated by pull requests or manual `workflow_dispatch`.
+- Reporting artifacts (Lakeview dashboards, Mermaid flowchart, Gemini exports) stay version-controlled alongside SQL/dbt sources.
 
 ## Workflow Overview
 
@@ -100,17 +99,18 @@ flowchart TD
 
 ## Prerequisites
 
-1. **AWS S3 bucket** with permission to upload CSV files.
+1. **AWS S3 bucket** with permission to upload CSV files (bronze landing zone).
 2. **Databricks workspace** with Unity Catalog and Serverless SQL enabled.
-   - A SQL warehouse (the project used ID `cd400faa731b591f`).
+   - A serverless SQL warehouse with permissions to run dbt/SQL (the project used ID `cd400faa731b591f`).
 3. **Databricks CLI** `v0.205+` installed and configured:
    ```bash
    databricks configure --profile accident
    # Host: https://<workspace>.cloud.databricks.com
    # Token: <personal-access-token>
    ```
-4. **Python 3.12+** on the machine running tests/scripts.
-5. **Cursor IDE** (optional but recommended) with the AI devkit activated.
+4. **Python 3.10+** (virtualenv compatible with `dbt-core==1.8.x`).
+5. **GitHub Actions secrets** populated (`DATABRICKS_HOST`, `DATABRICKS_HTTP_PATH`, `DATABRICKS_TOKEN`, optional `DATABRICKS_ORG_ID`).
+6. **Cursor IDE** (optional but recommended) with the AI devkit activated for prompt-driven workflows.
 
 ## Local dbt Development
 
