@@ -4,6 +4,10 @@ A Databricks lakehouse that ingests the Transport Victoria road-crash dataset in
 
 ![End-to-end lakehouse flow](images/workflow_overview.png)
 
+![Spatial hotspots dashboard](images/spatial_hotspots_fatal_map.png)
+
+*Spatial hotspots view highlighting fatal crash clusters across Victoria (2022‑2024).*
+
 ## Contents
 
 - [Data Sources](#data-sources)
@@ -73,13 +77,13 @@ Key points:
 
 ```mermaid
 flowchart TD
-  A[Cursor Plan: research & charter] --> B[AWS S3 bronze ingest]
-  B --> C[Databricks serverless SQL warehouse]
-  C --> D[Lakehouse SQL + Genie dashboards]
-  D --> E[dbt scaffolding & tests]
-  E --> F[GitHub Actions CI (manual/PR)]
-  F --> G[Reporting via Mermaid + Gemini export]
-  G --> H[Owner review & production push]
+  cursor_plan("Cursor planning") --> bronze_ingest("AWS S3 bronze ingest")
+  bronze_ingest --> sql_wh("Databricks serverless SQL warehouse")
+  sql_wh --> dashboards("Lakehouse SQL and Genie dashboards")
+  dashboards --> dbt_steps("dbt scaffolding and tests")
+  dbt_steps --> ci_checks("GitHub Actions CI manual trigger")
+  ci_checks --> reporting("Reporting via Mermaid and Gemini export")
+  reporting --> final_review("Owner review and production push")
 ```
 
 ## Repository Layout

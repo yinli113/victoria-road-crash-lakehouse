@@ -2,7 +2,7 @@ name: dbt Build
 
 on:
   workflow_dispatch:
-  pull_request:
+  # pull_request trigger deliberately disabled to avoid automatic runs
 
 env:
   DBT_PROFILES_DIR: ${{ github.workspace }}/profiles
