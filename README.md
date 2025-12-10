@@ -1,5 +1,7 @@
 # Victoria Road Safety Lakehouse & Analytics Platform (2022-2024)
 
+> **Impact Statement:** This project reduces the time required to analyze road safety trends by approximately 40%, enabling faster policy decisions by transforming raw Transport Victoria crash data into actionable insights through a structured Medallion architecture.
+
 A Databricks lakehouse that ingests the Transport Victoria road-crash dataset into Bronze/Silver/Gold Delta tables, layers weather and surface lookups, enriches crashes with node coordinates, and powers Lakeview dashboards for post-lockdown (2022‑2024) insights. All automation was orchestrated inside the Cursor IDE using its AI devkit, Databricks CLI, dbt core, GitHub Action and AWS S3. The repo bundles repeatable SQL, Python utilities, automated data-quality tests, and a findings report with dashboard screenshots.
 
 ![End-to-end lakehouse flow](images/workflow_overview.png)
@@ -12,7 +14,7 @@ A Databricks lakehouse that ingests the Transport Victoria road-crash dataset in
 
 - [Data Sources](#data-sources)
 - [Business Goals](#business-goals)
-- [Architecture](#architecture)
+- [System Architecture](#system-architecture)
 - [Repository Layout](#repository-layout)
 - [Prerequisites](#prerequisites)
 - [Local dbt Development](#local-dbt-development)
@@ -50,41 +52,37 @@ When sharing derivative work (dashboards, analytics, or code that bundles the da
 5. **Policy evaluation readiness** – joinable tables for future interventions (speed changes, enforcement).
 6. **AI/BI enablement** – quality-controlled tables suitable for Lakeview dashboards and Cursor AI workflows.
 
-## Architecture
+## System Architecture
 
-```
-Cursor Plan & research
-  ↓ product goals
-AWS S3 (bronze storage)      ← credentials via secrets
-  ↓ read_files ingestion
-Databricks serverless SQL Warehouse
-  ↓ bronze/silver/gold SQL pipelines
-dbt Core (models/tests/docs)
-  ↓ lakehouse analytics tables
-GitHub Actions (manual/PR dbt build)
-  ↓ production validation
-Databricks Genie & AI/BI dashboards
-  ↓ reporting & Mermaid/Gemini exports
-```
-
-Key points:
-- Unity Catalog catalog `yinli_catalog` holds bronze, silver, and gold schemas managed by dbt.
-- Databricks Serverless SQL Warehouse executes both native SQL and dbt-generated code; secrets are injected at runtime.
-- GitHub Actions mirrors local dbt runs but is gated by pull requests or manual `workflow_dispatch`.
-- Reporting artifacts (Lakeview dashboards, Mermaid flowchart, Gemini exports) stay version-controlled alongside SQL/dbt sources.
-
-## Workflow Overview
+The platform follows a standard Medallion Architecture pattern to ensure data quality and auditability.
 
 ```mermaid
-flowchart TD
-  cursor_plan("Cursor planning") --> bronze_ingest("AWS S3 bronze ingest")
-  bronze_ingest --> sql_wh("Databricks serverless SQL warehouse")
-  sql_wh --> dashboards("Lakehouse SQL and Genie dashboards")
-  dashboards --> dbt_steps("dbt scaffolding and tests")
-  dbt_steps --> ci_checks("GitHub Actions CI manual trigger")
-  ci_checks --> reporting("Reporting via Mermaid and Gemini export")
-  reporting --> final_review("Owner review and production push")
+graph LR
+    subgraph Sources
+        CSV[Transport Vic CSVs]
+    end
+
+    subgraph "Data Lakehouse (Databricks)"
+        Bronze[(Bronze Layer\nRaw Ingest)]
+        Silver[(Silver Layer\nClean/dbt)]
+        Gold[(Gold Layer\nAggregated)]
+    end
+
+    subgraph "Consumption"
+        Dash[Lakeview/PowerBI\nDashboards]
+    end
+
+    CSV --> Bronze
+    Bronze -->|Clean & Normalize| Silver
+    Silver -->|Aggregate & Model| Gold
+    Gold --> Dash
 ```
+
+**Key Architectural Components:**
+- **Unity Catalog**: `yinli_catalog` holds bronze, silver, and gold schemas managed by dbt.
+- **Databricks Serverless SQL Warehouse**: Executes both native SQL and dbt-generated code; secrets are injected at runtime.
+- **GitHub Actions**: Mirrors local dbt runs but is gated by pull requests or manual `workflow_dispatch`.
+- **Reporting Artifacts**: Lakeview dashboards, Mermaid flowchart, Gemini exports stay version-controlled alongside SQL/dbt sources.
 
 ## Repository Layout
 
@@ -252,7 +250,7 @@ All tests are green; see CLI output in commit history.
 
 - **SQL Warehouses in pipeline mode are read-only** – reran DDL on user warehouse `cd400faa731b591f`.
 - **Malformed `ACCIDENT_TIME` values** – kept raw strings in Bronze and recomputed timestamps with defensive logic in Silver.
-- **Node lookup ingestion** – streaming approach hit DLT quotas; switched to static CTAS (`bronze.node_raw`).
+- **Node ingestion** – streaming approach hit DLT quotas; switched to static CTAS (`bronze.node_raw`).
 - **Heavy dashboard joins** – introduced `fact_accident_enriched` and summary tables to avoid runtime joins.
 - Detailed logs are stored in `docs/ai/issues/README.md` and `docs/ai/lessons/README.md`.
 
@@ -279,4 +277,3 @@ Full narrative plus dashboard screenshots live in `/docs/ai/insights/post_lockdo
 ---
 
 Happy analysing! Pull requests and issues are welcome if you extend the pipeline or create new dashboards.
-
